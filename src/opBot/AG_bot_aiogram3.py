@@ -141,3 +141,7 @@ if __name__ == '__main__':
         asyncio.run(main())
     except KeyboardInterrupt:
         print('Exit')
+
+# нет решения
+# Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+# Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7067956532)
