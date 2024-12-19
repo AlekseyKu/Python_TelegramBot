@@ -1,6 +1,4 @@
 import asyncio
-# import logging
-# import random
 import os
 import re
 import schedule
@@ -8,34 +6,25 @@ import requests
 
 from datetime import datetime
 from dotenv import load_dotenv
-
 from bs4 import BeautifulSoup
-
 from aiogram import Bot, Dispatcher
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, URLInputFile
-
 from selenium.common.exceptions import TimeoutException
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-# from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 
-# from handler import is_instagram_reels_url, download_reels, db_path_remove_lines, db_path_get_url
-# from lib.AG_caption_list import caption_list
-# from lists import caption_list
-
 load_dotenv()
-# token_AG = os.environ.get('BOT_TOKEN_AG')
-# group_id_AG = os.environ.get('GROUP_ID_AG')
-# db_path = r"lib/links_AG.txt"
+token_AG = os.environ.get('BOT_TOKEN_AG')
+group_id_AG = os.environ.get('GROUP_ID_AG')
+db_path_AG = r"lib/links_AG.txt"
 
 token_AW = os.environ.get('BOT_TOKEN_AW')
 group_id_AW = os.environ.get('GROUP_ID_AW')
 db_path_AW = r"lib/links_AW.txt"
 
-# service = Service(executable_path="/home/tg_bot/chromedriver")
 options = webdriver.ChromeOptions()
 options.add_argument('--headless')
 options.add_argument('--no-sandbox')  # (!) for hosting
@@ -119,6 +108,9 @@ def get_discription():
     webpage = requests.get(url, headers=headers)
     soup = BeautifulSoup(webpage.content, "html.parser")
     title = soup.title.string.split('\n')[0]
+    words_remove = "Instagram"
+    for word in words_remove:
+        title = title.replace(word, "")
 
     return title
 
@@ -196,16 +188,15 @@ async def cmd_start_bot(msg: Message):
             try:
                 await job()
             except Exception as e:
-                await bot_AW.send_message(msg.chat.id,  f'Failed second time to send to AW group at {current_datetime}')
+                await bot_AW.send_message(msg.chat.id, f'Failed second time to send to AW group at {current_datetime}')
                 print(f'Failed second time to send to AW group at {current_datetime}')
-
 
     # schedule for run a bot for sending videos
     # schedule.every(30).minutes.do(lambda: asyncio.create_task(job()))
-    schedule.every().day.at("15:00").do(lambda: asyncio.create_task(job()))
-    schedule.every().day.at("21:00").do(lambda: asyncio.create_task(job()))
-    schedule.every().day.at("03:00").do(lambda: asyncio.create_task(job()))
-    schedule.every().day.at("09:00").do(lambda: asyncio.create_task(job()))
+    # schedule.every().day.at("17:00").do(lambda: asyncio.create_task(job()))
+    # schedule.every().day.at("17:21").do(lambda: asyncio.create_task(job()))
+    # schedule.every().day.at("17:52").do(lambda: asyncio.create_task(job()))
+    # schedule.every().day.at("22:49").do(lambda: asyncio.create_task(job()))
     # schedule.every().day.at("22:30").do(lambda: asyncio.create_task(job()))
 
     await job()
@@ -240,7 +231,6 @@ async def cmd_test(msg: Message):
         await bot_AW.send_message(msg.chat.id, "Unable to download")
 
 
-
 # get url video from bot (admin send url) and save to DB
 @dp.message()
 async def save_url_to_list(msg: Message):
@@ -253,17 +243,6 @@ async def save_url_to_list(msg: Message):
             file.write(msg_url + '\n')
         await msg.answer("Link received and write to DB")
         print('Link received and write to LIST')
-
-
-# @dp.message(Command('cap'))
-# async def cap(msg: Message):
-#     photo = png.png
-#     await bot.send_photo(msg.chat.id, caption="caption!!!")
-
-
-# @dp.message(F.text == 'Как дела?')
-# async def zbs(msg: Message):
-# await msg.answer("ZBS")
 
 
 async def task(msg: Message):
@@ -281,4 +260,3 @@ if __name__ == '__main__':
         asyncio.run(main())
     except KeyboardInterrupt:
         print('Exit')
-
